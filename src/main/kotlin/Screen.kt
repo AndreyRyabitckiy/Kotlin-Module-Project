@@ -1,0 +1,3 @@
+interface Screen {
+    fun open()
+}
