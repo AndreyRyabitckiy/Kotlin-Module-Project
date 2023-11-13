@@ -4,63 +4,60 @@ class MenuOpenArhive : Screen {
     override fun open() {
         val scanner = Scanner(System.`in`)
         while (true) {
-            println("_____Меню_____")
-            println("1. Создать архив")
-            println("2. Выбрать архив")
-            println("3. Выход")
-            println("--------------")
+            val arhive = Storage.listArhive()
+            val size = Storage.getArhiveSize()
+            println("\n---------------")
+            println("Сохраненные архивы")
+            for (i in arhive.indices) {
+                println("$i. ${arhive[i]}")
+            }
+            println("--Пункты меню--")
+            println("${arhive.lastIndex + 1}. Создать архив")
+            println("${arhive.lastIndex + 2}. Выход")
+            println("Введите номер нужного вам архива или пункт меню")
+            println("---------------\n")
             val line = scanner.nextLine()
-            if (!line.isNullOrEmpty() && line.isDigit())
+            if (!line.isNullOrBlank() && line.isDigit()) {
                 when (line.toInt()) {
-                    1 -> createArhive()
-                    2 -> openArhive()
-                    3 -> Navigator.exit()
-                    else -> println("Введите число от 1 до 3")
-                } else {
-                println("Введите число!")
+                    arhive.lastIndex + 1 -> {
+                        create()
+                    }
+
+                    arhive.lastIndex + 2 -> {
+                        Navigator.exit()
+                    }
+
+                    else -> {
+                        if (line.toInt() <= size && line.toInt() > -1) {
+                            Navigator.open(MenuOpenNote(line.toInt()))
+                            break
+                        } else {
+                            println("Введите число от 0 до ${arhive.lastIndex + 2}")
+                        }
+                    }
+                }
+            } else {
+                println("Введите число! \n")
             }
         }
     }
 
-    private fun createArhive() {
+    override fun create() {
         while (true) {
             println("Введите имя архива")
             val scanner = Scanner(System.`in`)
             val name = scanner.nextLine()
-            if (!name.isNullOrEmpty()) {
+            if (!name.isNullOrBlank()) {
                 Storage.newArhive(name)
-                println("Архив $name Успешно создан")
+                println("Архив $name Успешно создан \n")
                 break
             } else {
                 println("Архив не может не иметь имени")
             }
         }
     }
-
-    private fun openArhive() {
-        while (true) {
-            val arhive = Storage.listArhive()
-            val size = Storage.getArhiveSize()
-            println("Сохраненные архивы")
-            for (i in arhive.indices) {
-                println("$i. ${arhive[i]}")
-            }
-            println("Введите номер нужного вам архива")
-            val scanner = Scanner(System.`in`)
-            val index = scanner.nextLine()
-            if (!index.isNullOrEmpty() && index.isDigit()) {
-                val answer = index.toInt()
-                if (answer <= size && answer > -1) {
-                    Navigator.open(MenuOpenNote(answer))
-                    break
-                } else {
-                    println("Введите число от 0 до ${size - 1}")
-                }
-            } else {
-                println("Введите корректное число")
-            }
-        }
-    }
 }
+
+
 
 
