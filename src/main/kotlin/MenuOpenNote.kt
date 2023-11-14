@@ -10,21 +10,22 @@ class MenuOpenNote(private val arhiveId: Int) : Screen() {
                 println("$i. ${noteIn[i]}")
             }
             println("--Пункты меню--")
-            println("${arhive.lastIndex + 1}. Создать заметку")
-            println("${arhive.lastIndex + 2}. Назад")
+            println("${noteIn.lastIndex + 1}. Создать заметку")
+            println("${noteIn.lastIndex + 2}. Назад")
             println("Введите номер нужной вам заметки или пункт меню")
             println("---------------\n")
             when (val line = getInputInt()) {
-                arhive.lastIndex + 1 -> {
+                noteIn.lastIndex + 1 -> {
                     create()
                 }
 
-                arhive.lastIndex + 2 -> {
+                noteIn.lastIndex + 2 -> {
                     Navigator.goBack()
                 }
 
                 else -> {
                     val textIndex = Storage.getNotesSize(arhiveId)
+                    print(textIndex)
                     if (line in 0..textIndex) {
                         val nameNote = noteIn[line]
                         Navigator.open(MenuOpenTextNote(arhiveId, line, nameNote))
