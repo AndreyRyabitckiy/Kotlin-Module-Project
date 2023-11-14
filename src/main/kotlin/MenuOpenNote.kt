@@ -1,14 +1,10 @@
-import java.util.Scanner
-
-class MenuOpenNote(private val arhiveId: Int) : Screen {
+class MenuOpenNote(private val arhiveId: Int) : Screen() {
 
     override fun open() {
-        val scaner = Scanner(System.`in`)
         while (true) {
             val arhive = Storage.listArhive()
             println("\n---------------")
-            val arhiveIndex = arhiveId
-            val noteIn = Storage.noteInArhive(arhiveIndex)
+            val noteIn = Storage.noteInArhive(arhiveId)
             println("Список заметок:")
             for (i in noteIn.indices) {
                 println("$i. ${noteIn[i]}")
@@ -18,58 +14,46 @@ class MenuOpenNote(private val arhiveId: Int) : Screen {
             println("${arhive.lastIndex + 2}. Назад")
             println("Введите номер нужной вам заметки или пункт меню")
             println("---------------\n")
-            val line = scaner.nextLine()
-            if (!line.isNullOrBlank() && line.isDigit()) {
-                when (line.toInt()) {
-                    arhive.lastIndex + 1 -> {
-                        create()
-                    }
-
-                    arhive.lastIndex + 2 -> {
-                        Navigator.goBack()
-                    }
-
-                    else -> {
-                        val textIndex = Storage.getNotesSize(arhiveId)
-                        val answer = line.toInt()
-                        if (answer >= 0 && answer <= textIndex) {
-                            val nameNote = noteIn[answer]
-                            Navigator.open(MenuOpenTextNote(arhiveId, answer, nameNote))
-                        } else {
-                            println("Введите число от 0 до ${textIndex + 1}")
-                        }
-
-                    }
+            when (val line = getInputInt()) {
+                arhive.lastIndex + 1 -> {
+                    create()
                 }
-            } else {
-                println("Введите число!")
+
+                arhive.lastIndex + 2 -> {
+                    Navigator.goBack()
+                }
+
+                else -> {
+                    val textIndex = Storage.getNotesSize(arhiveId)
+                    if (line in 0..textIndex) {
+                        val nameNote = noteIn[line]
+                        Navigator.open(MenuOpenTextNote(arhiveId, line, nameNote))
+                    } else {
+                        println("Введите число от 0 до ${textIndex + 1}")
+                    }
+
+                }
             }
         }
     }
 
 
     override fun create() {
-        val scaner = Scanner(System.`in`)
-        val index = arhiveId
-        while (true) {
+        var dontHaveName = true
+        var dontHaveText = true
+        while (dontHaveName) {
             println("\nВведите название заметки")
-            val name = scaner.nextLine()
-            if (!name.isNullOrBlank()) {
-                while (true) {
+            getinputString()?.let { name ->
+                dontHaveName = false
+                while (dontHaveText) {
                     println("Введите текст заметки")
-                    val text = scaner.nextLine()
-                    if (!text.isNullOrBlank()) {
-                        Storage.addToArhive(index, name, text)
+                    getinputString()?.let { text ->
+                        dontHaveText = false
+                        Storage.addToArhive(arhiveId, name, text)
                         println("Заметка $name добавлена в архив\n")
-                        break
-                    } else {
-                        println("Заметка не может не иметь текст")
-                    }
+                    } ?: println("Заметка не может не иметь текст")
                 }
-                break
-            } else {
-                println("Заметка не может не иметь названия")
-            }
+            } ?: println("Заметка не может не иметь названия")
         }
     }
 }
